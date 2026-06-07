@@ -89,4 +89,3 @@ bun db:push
 
 This project is licensed under the
 [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.html).
-(Note: GPL v4 has not been released yet).
