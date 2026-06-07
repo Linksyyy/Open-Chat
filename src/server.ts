@@ -2,9 +2,9 @@ import { createServer } from "http";
 import cookie from "cookie";
 import next from "next";
 import { Server } from "socket.io";
-import { jwtVerify } from "jose";
+// import { jwtVerify } from "jose";
 
-const socketsMap = new Map();
+// const socketsMap = new Map();
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
