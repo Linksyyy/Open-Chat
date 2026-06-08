@@ -2,52 +2,54 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-p-0 text-foreground flex flex-col w-full items-center justify-center font-sans p-6">
-      <div className="max-w-md w-full text-center space-y-8">
+    <div className="min-h-screen bg-p-0 text-foreground flex flex-col items-center justify-center p-6 font-sans">
+      <div className="w-full max-w-md text-center">
         <div className="space-y-3">
-          <div className="cursor-default inline-flex items-center justify-center w-16 h-16 rounded-full bg-p-1 text-p-3 text-3xl font-bold shadow-lg">
+          <div className="inline-flex h-16 w-16 cursor-default items-center justify-center rounded-full bg-p-1 text-3xl font-bold text-p-3 shadow-lg">
             💬
           </div>
-          <h1 className="text-4xl font-extrabold cursor-default tracking-tight bg-linear-to-r from-foreground to-p-3 bg-clip-text text-transparent">
+
+          <h1 className="cursor-default bg-linear-to-r from-foreground to-p-3 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent">
             Open Chat
           </h1>
-          <p className="text-sm cursor-default text-foreground-1">
+
+          <p className="cursor-default text-sm text-foreground-1">
             Open source realtime chat
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="mt-8 flex flex-col gap-4">
           <Link
             href="/login"
-            className="cursor-pointer w-full py-3 px-4 rounded-xl bg-p-1 hover:bg-p-2 text-foreground font-semibold transition-colors duration-200 shadow-md transform hover:-translate-y-0.5"
+            className="flex w-full items-center justify-center rounded-xl bg-p-1 px-4 py-3 font-semibold text-foreground shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-p-2"
           >
             Log In
           </Link>
 
           <Link
             href="/register"
-            className="cursor-pointer w-full py-3 px-4 rounded-xl bg-s-2 hover:bg-s-1 text-foreground font-bold transition-colors duration-200 shadow-lg transform hover:-translate-y-0.5"
+            className="flex w-full items-center justify-center rounded-xl bg-s-2 px-4 py-3 font-bold text-foreground shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-s-1"
           >
             Register Now
           </Link>
         </div>
 
-        <div className="flex items-center justify-center space-x-2 my-6">
-          <div className="h-px w-12 bg-p-1"></div>
-          <span className="cursor-default text-xs text-gray-500 uppercase tracking-wider font-semibold">
+        <div className="my-6 flex items-center justify-center gap-2">
+          <div className="h-px w-12 bg-p-1" />
+          <span className="cursor-default text-xs font-semibold uppercase tracking-wider text-foreground-1">
             Or explore
           </span>
-          <div className="h-px w-12 bg-p-1"></div>
+          <div className="h-px w-12 bg-p-1" />
         </div>
 
         <a
           href="https://github.com/linksyyy/open-chat"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center space-x-2 text-sm text-gray-400 hover:text-p-3 bg-p-0 border border-p-1 hover:border-p-2 py-2.5 px-5 rounded-lg transition-all duration-200"
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-p-1 bg-p-0 px-5 py-2.5 text-sm text-foreground-1 transition-all duration-200 hover:border-p-2 hover:text-p-3"
         >
           <svg
-            className="w-5 h-5 fill-current"
+            className="h-5 w-5 fill-current"
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
@@ -57,6 +59,7 @@ export default function Home() {
               clipRule="evenodd"
             />
           </svg>
+
           <span>View GitHub Repository</span>
         </a>
       </div>
