@@ -1,10 +1,8 @@
-"use client";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Home() {
-  const router = useRouter();
   return (
-    <div className="min-h-screen bg-p-0 text-white flex flex-col items-center justify-center font-sans p-6">
+    <div className="min-h-screen bg-p-0 text-foreground flex flex-col w-full items-center justify-center font-sans p-6">
       <div className="max-w-md w-full text-center space-y-8">
         <div className="space-y-3">
           <div className="cursor-default inline-flex items-center justify-center w-16 h-16 rounded-full bg-p-1 text-p-3 text-3xl font-bold shadow-lg">
@@ -19,19 +17,19 @@ export default function Home() {
         </div>
 
         <div className="space-y-4">
-          <button
-            onClick={() => router.push("/login")}
+          <Link
+            href="/login"
             className="cursor-pointer w-full py-3 px-4 rounded-xl bg-p-1 hover:bg-p-2 text-foreground font-semibold transition-colors duration-200 shadow-md transform hover:-translate-y-0.5"
           >
             Log In
-          </button>
+          </Link>
 
-          <button
-            onClick={() => router.push("/register")}
+          <Link
+            href="/register"
             className="cursor-pointer w-full py-3 px-4 rounded-xl bg-s-2 hover:bg-s-1 text-foreground font-bold transition-colors duration-200 shadow-lg transform hover:-translate-y-0.5"
           >
             Register Now
-          </button>
+          </Link>
         </div>
 
         <div className="flex items-center justify-center space-x-2 my-6">
