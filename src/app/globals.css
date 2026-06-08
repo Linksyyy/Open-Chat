@@ -2,19 +2,34 @@
 
 :root {
   --p-0: #ffffff;
-  --p-1: #1f1f1f;
-  --p-2: #000;
+  --p-1: #f8f8f8;
+  --p-2: #eeeeee;
+  --p-3: #e4e4e4;
+
+  --s-0: #6d28d9;
+  --s-1: #5b21b6;
+  --s-2: #4c1d95;
+  --s-3: #2e1065;
+
   --foreground: #171717;
+  --foreground-1: #7c7c7c;
+  --background: #fafafa;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --p-0: #020202;
-    --p-1: #060606;
-    --p-2: #090909;
-    --p-3: #0d0d0d;
-    --p-4: #0f0f0f;
+    --p-0: #050505;
+    --p-1: #101010;
+    --p-2: #181818;
+    --p-3: #232323;
+
+    --s-0: #4b0082;
+    --s-1: #3a0066;
+    --s-2: #24004b;
+    --s-3: #120024;
+
     --foreground: #ededed;
+    --foreground-1: #bfbfbf;
     --background: #030303;
   }
 }
@@ -24,8 +39,14 @@
   --color-p-1: var(--p-1);
   --color-p-2: var(--p-2);
   --color-p-3: var(--p-3);
-  --color-p-4: var(--p-4);
+
+  --color-s-0: var(--s-0);
+  --color-s-1: var(--s-1);
+  --color-s-2: var(--s-2);
+  --color-s-3: var(--s-3);
+
   --color-foreground: var(--foreground);
+  --color-foreground-1: var(--foreground-1);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

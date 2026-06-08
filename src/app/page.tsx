@@ -1,9 +1,15 @@
-import Sidebar from "@/Components/Sidebar";
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function Home() {
-  return (
-    <div className="flex bg-zinc-50 font-sans dark:bg-black">
-      <Sidebar />
-    </div>
-  );
+export default function Root() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwt_token");
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    token ? router.push("/chats") : router.push("/home");
+  }, [router]);
+  return <div></div>;
 }
