@@ -1,7 +1,49 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Register() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confPassword, setConfPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  async function handleSubmit(e: React.SubmitEvent) {
+    e.preventDefault();
+    setError("");
+
+    if (password.length < 4) {
+      setError("Password must be at least 4 characters long");
+      return;
+    }
+
+    if (password !== confPassword) {
+      setError("The passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Registration failed");
+        return;
+      }
+
+      router.push("/login");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      setError("Failed to connect to the server");
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen w-full items-center justify-center">
       <div className="flex flex-col bg-p-1 p-8 rounded-4xl min-w-2/9 border border-p-2 shadow-sm">
@@ -9,10 +51,7 @@ export default function Register() {
           Sign up
         </h1>
 
-        <form
-          className="flex flex-col gap-4"
-          onSubmit={(e) => e.preventDefault()}
-        >
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-2">
             <label className="text-xl text-foreground font-sans">
               Username
@@ -20,6 +59,9 @@ export default function Register() {
             <input
               type="text"
               className="w-full bg-p-2 text-foreground p-3 rounded-xl border border-p-3 outline-none transition-colors focus:border-s-0 focus:ring-1 focus:ring-s-0"
+              onChange={(e) => setUsername(e.target.value.trim())}
+              value={username}
+              required
             />
           </div>
 
@@ -30,6 +72,9 @@ export default function Register() {
             <input
               type="password"
               className="w-full bg-p-2 text-foreground p-3 rounded-xl border border-p-3 outline-none transition-colors focus:border-s-0 focus:ring-1 focus:ring-s-0"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              required
             />
           </div>
 
@@ -40,8 +85,13 @@ export default function Register() {
             <input
               type="password"
               className="w-full bg-p-2 text-foreground p-3 rounded-xl border border-p-3 outline-none transition-colors focus:border-s-0 focus:ring-1 focus:ring-s-0"
+              onChange={(e) => setConfPassword(e.target.value)}
+              value={confPassword}
+              required
             />
           </div>
+
+          {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
           <div className="flex gap-4 mt-4">
             <Link

@@ -6,7 +6,7 @@ export const notificationsTypesEnum = pgEnum("notification_type", [
 ]);
 
 export const users = pgTable("users", {
-  id: uuid().primaryKey().defaultRandom(),
+  id: uuid().primaryKey(),
   username: varchar({ length: 255 }).unique().notNull(),
   password_hash: varchar({ length: 255 }).notNull(),
   created_at: timestamp().notNull().defaultNow(),
