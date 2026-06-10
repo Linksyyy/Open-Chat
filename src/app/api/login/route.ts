@@ -3,7 +3,22 @@ import bcrypt from "bcrypt";
 import * as db from "@/db/queries";
 import { SignJWT } from "jose";
 
-export async function POST(request: NextRequest) {
+export type LoginResponse = {
+  message: string;
+  user: {
+    id: string;
+    username: string;
+    created_at: string;
+  };
+};
+
+export type ErrLoginResponse = {
+  message: string;
+};
+
+export async function POST(
+  request: NextRequest,
+): Promise<NextResponse<LoginResponse | ErrLoginResponse>> {
   const data = await request.json();
   const username = data.username.trim().toLowerCase();
   const password = data.password;
@@ -37,12 +52,13 @@ export async function POST(request: NextRequest) {
       user: {
         id: user.id,
         username: user.username,
+        created_at: user.created_at,
       },
     },
     { status: 200 },
   );
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-  const JWTtoken = await new SignJWT({ userId: user.id })
+  const JWTtoken = await new SignJWT({ user: user })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("30d")
     .sign(secret);

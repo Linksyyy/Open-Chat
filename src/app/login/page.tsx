@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { LoginResponse } from "../api/login/route";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -25,12 +26,19 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json();
+      const data: LoginResponse = await response.json();
 
       if (!response.ok) {
         setError(data.message || "An error occurred");
         return;
       }
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...data.user,
+        }),
+      );
 
       router.push("/");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
