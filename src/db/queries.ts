@@ -1,14 +1,13 @@
 import { eq } from "drizzle-orm";
 import db from "./db";
 import * as schemas from "./schemas";
-import { v7 } from "uuid";
 
 //All db queries will named as snake_case
 
 export async function create_user(username: string, password_hash: string) {
   return await db
     .insert(schemas.users)
-    .values({ id: v7(), username, password_hash })
+    .values({ username, password_hash })
     .returning();
 }
 
