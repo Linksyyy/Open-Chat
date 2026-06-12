@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --p-0: #ffffff;
-  --p-1: #f8f8f8;
-  --p-2: #eeeeee;
-  --p-3: #e4e4e4;
+  --p-0: #fff;
+  --p-1: #eee;
+  --p-2: #aaa;
+  --p-3: #888;
 
   --s-0: #6d28d9;
   --s-1: #5b21b6;
@@ -13,6 +13,7 @@
 
   --foreground: #171717;
   --foreground-1: #7c7c7c;
+  --invforeground: #ffffff;
   --background: #fafafa;
 }
 
@@ -30,6 +31,7 @@
 
     --foreground: #ededed;
     --foreground-1: #bfbfbf;
+    --invforeground: #050505;
     --background: #030303;
   }
 }
@@ -47,6 +49,7 @@
 
   --color-foreground: var(--foreground);
   --color-foreground-1: var(--foreground-1);
+  --color-invforeground: var(--invforeground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

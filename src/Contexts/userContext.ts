@@ -1,14 +1,17 @@
 import { create } from "zustand";
 
-export type UserStore = {
+export type User = {
   id: string;
   username: string;
   created_at: string;
-
-  setUser: (user: { id: string; username: string; created_at: string }) => void;
 };
 
-export default create<UserStore>((set) => ({
+export type UserStore = User & {
+  setUser: (user: { id: string; username: string; created_at: string }) => void;
+  getUser: () => User;
+};
+
+const useUserStore = create<UserStore>((set, get) => ({
   id: "",
   username: "",
   created_at: "",
@@ -17,4 +20,10 @@ export default create<UserStore>((set) => ({
     set({
       ...user,
     }),
+  getUser: () => {
+    const { id, username, created_at } = get();
+    return { id, username, created_at };
+  },
 }));
+
+export default useUserStore;
