@@ -30,7 +30,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   notifications: many(notifications),
 }));
 
-export const chats = pgTable("groups", {
+export const chats = pgTable("chats", {
   id: uuid().primaryKey().$defaultFn(v7),
   name: varchar({ length: 255 }).notNull(),
   creator_id: uuid()
@@ -54,7 +54,7 @@ export const memberships = pgTable("memberships", {
   user_id: uuid()
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
-  group_id: uuid()
+  chat_id: uuid()
     .references(() => chats.id, { onDelete: "cascade" })
     .notNull(),
   role: rolesEnum().default("guest"),
@@ -67,7 +67,7 @@ export const membershipsRelations = relations(memberships, ({ one }) => ({
     references: [users.id],
   }),
   chat: one(chats, {
-    fields: [memberships.group_id],
+    fields: [memberships.chat_id],
     references: [chats.id],
   }),
 }));
@@ -77,11 +77,11 @@ export const messages = pgTable("messages", {
   sender_id: uuid()
     .references(() => users.id)
     .notNull(),
-  group_id: uuid()
+  chat_id: uuid()
     .references(() => chats.id, { onDelete: "cascade" })
     .notNull(),
   content: text().notNull(),
-  sended_at: timestamp().defaultNow(),
+  created_at: timestamp().defaultNow(),
 });
 
 export const messagesRelations = relations(messages, ({ one }) => ({
@@ -90,7 +90,7 @@ export const messagesRelations = relations(messages, ({ one }) => ({
     references: [users.id],
   }),
   chat: one(chats, {
-    fields: [messages.group_id],
+    fields: [messages.chat_id],
     references: [chats.id],
   }),
 }));
@@ -100,7 +100,7 @@ export const notifications = pgTable("notifications", {
   sender_id: uuid()
     .references(() => users.id)
     .notNull(),
-  group_id: uuid()
+  chat_id: uuid()
     .references(() => chats.id, { onDelete: "cascade" })
     .notNull(),
   type: notificationsTypesEnum().notNull(),
@@ -112,7 +112,7 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
     references: [users.id],
   }),
   chat: one(chats, {
-    fields: [notifications.group_id],
+    fields: [notifications.chat_id],
     references: [chats.id],
   }),
 }));
