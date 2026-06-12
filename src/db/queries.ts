@@ -18,3 +18,18 @@ export async function find_user_by_username(username: string) {
     .where(eq(schemas.users.username, username));
   return res[0];
 }
+
+export async function find_user_by_id(id: string) {
+  const res = await db
+    .select()
+    .from(schemas.users)
+    .where(eq(schemas.users.id, id));
+  return res[0];
+}
+
+export async function create_group(name: string, creator_id: string) {
+  return await db
+    .insert(schemas.chats)
+    .values({ name, creator_id })
+    .returning();
+}

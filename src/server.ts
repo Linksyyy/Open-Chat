@@ -2,9 +2,10 @@ import { createServer } from "http";
 import cookie from "cookie";
 import next from "next";
 import { Server } from "socket.io";
+import * as db from "@/db/queries";
 // import { jwtVerify } from "jose";
 
-// const socketsMap = new Map();
+const socketsMap = new Map();
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -34,10 +35,15 @@ app.prepare().then(async () => {
   });
 
   io.on("connection", async (socket) => {
-    console.log("connected");
-    // const user = await findUser((socket as any).userId);
-    // socketsMap.set(user.id, socket.id);
-    // console.log(`The user ${user.username} connected`);
+    const user = await db.find_user_by_id(socket.handshake.auth.userId);
+
+    console.log(`The user ${user.username} connected`);
+    socketsMap.set(user.id, socket.id);
+
+    socket.on("create-group", async (groupName: string) => {
+      const group = await db.create_group(groupName, user.id);
+      socket.emit("group-created", group);
+    });
   });
   const port = process.env.PORT || 3000;
   const host = "0.0.0.0";

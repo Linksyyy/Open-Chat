@@ -2,6 +2,7 @@
   "name": "atvd-engenharia-de-dados",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "NODE_OPTIONS='--no-deprecation' tsx watch --env-file=.env src/server.ts",
     "build": "next build",
