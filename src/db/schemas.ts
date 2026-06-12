@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { v7 } from "uuid";
 import { nanoid } from "nanoid";
+import { relations } from "drizzle-orm";
 
 export const rolesEnum = pgEnum("roles", ["guest", "admin"]);
 export const notificationsTypesEnum = pgEnum("notification_type", [
@@ -22,13 +23,31 @@ export const users = pgTable("users", {
   created_at: timestamp().notNull().defaultNow(),
 });
 
+export const usersRelations = relations(users, ({ many }) => ({
+  memberships: many(memberships),
+  messages: many(messages),
+  createdChats: many(chats),
+  notifications: many(notifications),
+}));
+
 export const chats = pgTable("groups", {
   id: uuid().primaryKey().$defaultFn(v7),
   name: varchar({ length: 255 }).notNull(),
   creator_id: uuid()
     .references(() => users.id, { onDelete: "set null" })
     .notNull(),
+  created_at: timestamp().notNull().defaultNow(),
 });
+
+export const chatsRelations = relations(chats, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [chats.creator_id],
+    references: [users.id],
+  }),
+  memberships: many(memberships),
+  messages: many(messages),
+  notifications: many(notifications),
+}));
 
 export const memberships = pgTable("memberships", {
   id: uuid().primaryKey().$defaultFn(v7),
@@ -42,8 +61,18 @@ export const memberships = pgTable("memberships", {
   entered_at: timestamp().defaultNow(),
 });
 
+export const membershipsRelations = relations(memberships, ({ one }) => ({
+  user: one(users, {
+    fields: [memberships.user_id],
+    references: [users.id],
+  }),
+  chat: one(chats, {
+    fields: [memberships.group_id],
+    references: [chats.id],
+  }),
+}));
+
 export const messages = pgTable("messages", {
-  // i will use NanoId here
   id: char({ length: 21 }).primaryKey().$defaultFn(nanoid),
   sender_id: uuid()
     .references(() => users.id)
@@ -55,6 +84,17 @@ export const messages = pgTable("messages", {
   sended_at: timestamp().defaultNow(),
 });
 
+export const messagesRelations = relations(messages, ({ one }) => ({
+  sender: one(users, {
+    fields: [messages.sender_id],
+    references: [users.id],
+  }),
+  chat: one(chats, {
+    fields: [messages.group_id],
+    references: [chats.id],
+  }),
+}));
+
 export const notifications = pgTable("notifications", {
   id: uuid().primaryKey().$defaultFn(v7),
   sender_id: uuid()
@@ -65,3 +105,14 @@ export const notifications = pgTable("notifications", {
     .notNull(),
   type: notificationsTypesEnum().notNull(),
 });
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  sender: one(users, {
+    fields: [notifications.sender_id],
+    references: [users.id],
+  }),
+  chat: one(chats, {
+    fields: [notifications.group_id],
+    references: [chats.id],
+  }),
+}));
