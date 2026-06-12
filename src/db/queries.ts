@@ -28,8 +28,65 @@ export async function find_user_by_id(id: string) {
 }
 
 export async function create_group(name: string, creator_id: string) {
-  return await db
-    .insert(schemas.chats)
-    .values({ name, creator_id })
-    .returning();
+  const group = (
+    await db.insert(schemas.chats).values({ name, creator_id }).returning()
+  )[0];
+  await db.insert(schemas.memberships).values({
+    user_id: creator_id,
+    chat_id: group.id,
+  });
+  return group;
 }
+
+export async function find_chat_by_id(group_id: string) {
+  return await db.query.chats.findFirst({
+    where: eq(schemas.chats.id, group_id),
+    with: {
+      memberships: {
+        with: {
+          user: true,
+        },
+      },
+    },
+  });
+}
+
+export async function get_user_chats(user_id: string) {
+  const memberships = await db.query.memberships.findMany({
+    where: eq(schemas.memberships.user_id, user_id),
+    with: {
+      chat: {
+        with: {
+          memberships: {
+            with: {
+              user: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  return memberships.map((m) => m.chat);
+}
+
+export async function find_messages_by_id(chat_id: string) {
+  return await db.query.messages.findMany({
+    where: eq(schemas.messages.chat_id, chat_id),
+    with: {
+      sender: {
+        columns: {
+          id: true,
+          username: true,
+        },
+      },
+    },
+    orderBy: (messages, { asc }) => [asc(messages.created_at)],
+  });
+}
+
+export type ChatWithMembers = NonNullable<
+  Awaited<ReturnType<typeof find_chat_by_id>>
+>;
+export type Messages = NonNullable<
+  Awaited<ReturnType<typeof find_messages_by_id>>
+>;
