@@ -3,6 +3,7 @@ import useUser from "@/Contexts/userContext";
 import { useState } from "react";
 import { FaPlus, FaUsers } from "react-icons/fa";
 import { FaBell } from "react-icons/fa6";
+import { socket } from "@/lib/socket";
 
 class Chat {
   nickname: string;
@@ -18,8 +19,16 @@ const chats: Chat[] = [];
 export default function Sidebar() {
   const { id, username, created_at } = useUser();
   const [view, setView] = useState<"chats" | "notifications" | "create-group">(
-    "chats"
+    "chats",
   );
+  const [groupName, setGroupName] = useState("");
+
+  const handleCreateGroup = () => {
+    if (!groupName.trim()) return;
+    socket.emit("create-group", groupName);
+    setGroupName("");
+    setView("chats");
+  };
 
   const enteredAt = new Date(created_at);
 
@@ -66,9 +75,14 @@ export default function Sidebar() {
               <input
                 type="text"
                 placeholder="Group name"
+                value={groupName}
+                onChange={(e) => setGroupName(e.target.value)}
                 className="bg-p-1 p-2 rounded-xl outline-none"
               />
-              <button className="bg-s-2 hover:bg-s-1 text-white p-2 rounded-xl transition-colors">
+              <button
+                onClick={handleCreateGroup}
+                className="bg-s-2 hover:bg-s-1 text-white p-2 rounded-xl transition-colors"
+              >
                 Create
               </button>
               <button
@@ -80,7 +94,7 @@ export default function Sidebar() {
             </div>
           ) : view === "chats" ? (
             <div>
-              <h2 className="text-xl font-bold mb-4 text-p-3">Contacts</h2>
+              <h2 className="text-xl font-bold mb-4 text-p-3">Chats</h2>
               {chats.length > 0 ? (
                 chats.map((el, i) => (
                   <button
@@ -94,7 +108,7 @@ export default function Sidebar() {
                   </button>
                 ))
               ) : (
-                <p className="text-neutral-400 text-sm">No contacts found</p>
+                <p className="text-neutral-400 text-sm">No chats found</p>
               )}
             </div>
           ) : (
