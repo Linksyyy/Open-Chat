@@ -1,36 +1,41 @@
 "use client";
 import useUser from "@/Contexts/userContext";
+import useChatStore from "@/Contexts/chatContext";
 import { useState } from "react";
 import { FaPlus, FaUsers } from "react-icons/fa";
 import { FaBell } from "react-icons/fa6";
 import { socket } from "@/lib/socket";
-
-class Chat {
-  nickname: string;
-  user: string;
-  constructor(nickname: string, user: string) {
-    this.nickname = nickname;
-    this.user = user;
-  }
-}
-
-const chats: Chat[] = [];
+import { useSocket } from "@/lib/useSocket";
+import { ChatWithMembers } from "@/db/queries";
+import useActualChatMessages from "@/Contexts/actualChatMessagesContext";
 
 export default function Sidebar() {
   const { id, username, created_at } = useUser();
+  const { chats, addChat } = useChatStore();
+  const { setChatName, setMessages } = useActualChatMessages();
   const [view, setView] = useState<"chats" | "notifications" | "create-group">(
     "chats",
   );
   const [groupName, setGroupName] = useState("");
 
-  const handleCreateGroup = () => {
+  const enteredAt = new Date(created_at);
+
+  function handleCreateGroup() {
     if (!groupName.trim()) return;
     socket.emit("create-group", groupName);
     setGroupName("");
     setView("chats");
-  };
+  }
 
-  const enteredAt = new Date(created_at);
+  function handleChatClick(chat: ChatWithMembers) {
+    setMessages([]);
+    setChatName({ id: chat.id, name: chat.name });
+    socket.emit("get-chat-messages", chat.id);
+  }
+
+  useSocket("group-created", (group) => {
+    addChat(group as ChatWithMembers);
+  });
 
   return (
     <div className="flex flex-col h-screen w-2/10">
@@ -95,21 +100,25 @@ export default function Sidebar() {
           ) : view === "chats" ? (
             <div>
               <h2 className="text-xl font-bold mb-4 text-p-3">Chats</h2>
-              {chats.length > 0 ? (
-                chats.map((el, i) => (
-                  <button
-                    key={i}
-                    className="border-p-4 w-full text-inherit justify-center items-start flex flex-col transition-colors duration-200 ease-in-out border-b hover:bg-p-4 rounded-xl p-2"
-                  >
-                    <h2 className="font-bold text-xl">{el.nickname}</h2>
-                    <h6 className="font-light text-sm text-neutral-400">
-                      {el.user}
-                    </h6>
-                  </button>
-                ))
-              ) : (
-                <p className="text-neutral-400 text-sm">No chats found</p>
-              )}
+              <div className="flex flex-col gap-2">
+                {chats.length > 0 ? (
+                  chats.map((chat, i) => (
+                    <button
+                      key={i}
+                      className="w-full text-left flex flex-col transition-all duration-200 ease-in-out hover:bg-p-2 rounded-2xl p-3 group hover:scale-95 cursor-pointer"
+                      onClick={() => handleChatClick(chat)}
+                    >
+                      <h2 className="font-semibold text-base text-foreground group-hover:text-foreground-1 transition-colors">
+                        {chat.name}
+                      </h2>
+                    </button>
+                  ))
+                ) : (
+                  <p className="text-neutral-400 text-sm text-center py-4">
+                    No chats found
+                  </p>
+                )}
+              </div>
             </div>
           ) : (
             <div>

@@ -1,28 +1,25 @@
 import useUser from "@/Contexts/userContext";
+import useActualChatMessages from "@/Contexts/actualChatMessagesContext";
 import ChatInput from "./ChatInput";
-
-const messages = [
-  { content: "10", sender_id: "other" },
-  { content: "9", sender_id: "019ea9ff-25c7-7289-bf32-42de3c4d75c6" },
-  { content: "8", sender_id: "other" },
-  { content: "7", sender_id: "019ea9ff-25c7-7289-bf32-42de3c4d75c6" },
-  { content: "6", sender_id: "other" },
-  { content: "5", sender_id: "019ea9ff-25c7-7289-bf32-42de3c4d75c6" },
-  { content: "4", sender_id: "other" },
-  { content: "3", sender_id: "019ea9ff-25c7-7289-bf32-42de3c4d75c6" },
-  { content: "2", sender_id: "other" },
-  {
-    content:
-      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    sender_id: "019ea9ff-25c7-7289-bf32-42de3c4d75c6",
-  },
-];
+import { useSocket } from "@/lib/useSocket";
+import { Messages } from "@/db/queries";
 
 export default function Chat() {
   const userStore = useUser();
+  const { name, messages, setMessages } = useActualChatMessages();
+
+  useSocket("chat-messages", (messages) => {
+    setMessages(messages as Messages);
+  });
+
   return (
     <div className="h-full w-full flex flex-col bg-p-1 p-4 md:p-8">
       <div className="flex-1 w-full bg-p-0 rounded-3xl shadow-sm flex flex-col overflow-hidden relative">
+        {name && (
+          <div className="p-4 border-b border-p-2 bg-p-0 z-10">
+            <h1 className="text-xl font-bold text-foreground">{name}</h1>
+          </div>
+        )}
         <div className="flex-1 w-full overflow-y-auto p-4 flex flex-col gap-3 scrollbar-hide">
           <div className="mt-auto h-4" />
           {messages.map((message, i) => {

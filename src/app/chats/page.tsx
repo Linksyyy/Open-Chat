@@ -1,14 +1,29 @@
 "use client";
 import Sidebar from "@/Components/Sidebar";
 import useUser from "@/Contexts/userContext";
+import useChatStore from "@/Contexts/chatContext";
+import useActualChatMessages from "@/Contexts/actualChatMessagesContext";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Chat from "@/Components/Chat";
 import { socket } from "@/lib/socket";
+import { useSocket } from "@/lib/useSocket";
+import { type ChatWithMembers, type Messages } from "@/db/queries";
 
 export default function Chats() {
   const userStore = useUser();
+  const { setChats } = useChatStore();
+  const { setMessages } = useActualChatMessages();
   const router = useRouter();
+
+  useSocket("init", (chats: unknown) => {
+    console.log(chats);
+    setChats(chats as ChatWithMembers[]);
+  });
+
+  useSocket("chat-messages", (messages: unknown) => {
+    setMessages(messages as Messages);
+  });
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "null");
