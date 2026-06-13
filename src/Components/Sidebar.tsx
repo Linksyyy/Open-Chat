@@ -3,7 +3,7 @@ import useUser from "@/Contexts/userContext";
 import useChatStore from "@/Contexts/chatContext";
 import useNotificationStore from "@/Contexts/notificationContext";
 import { useState } from "react";
-import { FaPlus, FaUsers, FaCheck } from "react-icons/fa";
+import { FaPlus, FaUsers, FaCheck, FaTimes } from "react-icons/fa";
 import { FaBell } from "react-icons/fa6";
 import { socket } from "@/lib/socket";
 import { useSocket } from "@/lib/useSocket";
@@ -38,6 +38,10 @@ export default function Sidebar() {
 
   function handleAcceptInvite(notificationId: string) {
     socket.emit("accept-invite", notificationId);
+  }
+
+  function handleDeclineInvite(notificationId: string) {
+    socket.emit("decline-invite", notificationId);
   }
 
   useSocket("group-created", (group) => {
@@ -158,13 +162,22 @@ export default function Sidebar() {
                         <span className="font-bold">{n.sender.username}</span> invited you to join{" "}
                         <span className="font-bold">{n.chat.name}</span>
                       </p>
-                      <button
-                        onClick={() => handleAcceptInvite(n.id)}
-                        className="bg-s-1 hover:bg-s-0 text-white text-xs py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 font-medium cursor-pointer"
-                      >
-                        <FaCheck size={10} />
-                        Accept
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleAcceptInvite(n.id)}
+                          className="flex-1 bg-s-1 hover:bg-s-0 text-white text-xs py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 font-medium cursor-pointer"
+                        >
+                          <FaCheck size={10} />
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => handleDeclineInvite(n.id)}
+                          className="flex-1 bg-p-2 hover:bg-p-3 text-foreground text-xs py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 font-medium cursor-pointer"
+                        >
+                          <FaTimes size={10} />
+                          Decline
+                        </button>
+                      </div>
                     </div>
                   ))
                 ) : (

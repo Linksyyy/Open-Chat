@@ -93,6 +93,11 @@ app.prepare().then(async () => {
       socket.emit("notification-deleted", notificationId);
     });
 
+    socket.on("decline-invite", async (notificationId: string) => {
+      await db.delete_notification(notificationId);
+      socket.emit("notification-deleted", notificationId);
+    });
+
     socket.on("get-chat-messages", async (chatId: string) => {
       const messages = await db.find_messages_by_id(chatId);
       socket.emit("chat-messages", messages);
