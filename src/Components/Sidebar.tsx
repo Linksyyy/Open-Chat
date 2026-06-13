@@ -10,7 +10,7 @@ import { ChatWithMembers } from "@/db/queries";
 import useActualChatMessages from "@/Contexts/actualChatMessagesContext";
 
 export default function Sidebar() {
-  const { id, username, created_at } = useUser();
+  const { username, created_at } = useUser();
   const { chats, addChat } = useChatStore();
   const { setChatName, setMessages } = useActualChatMessages();
   const [view, setView] = useState<"chats" | "notifications" | "create-group">(
@@ -31,6 +31,7 @@ export default function Sidebar() {
     setMessages([]);
     setChatName({ id: chat.id, name: chat.name });
     socket.emit("get-chat-messages", chat.id);
+    socket.emit("join-chat", chat.id);
   }
 
   useSocket("group-created", (group) => {
@@ -132,9 +133,8 @@ export default function Sidebar() {
         <div className="w-full flex flex-col py-5 justify-center items-center">
           <p className="text-foreground">Logged in as {username}</p>
           <p className="text-foreground-1 text-sm">
-            Entered at {enteredAt.toLocaleDateString("pt-br")}
+            Created at {enteredAt.toLocaleDateString("pt-br")}
           </p>
-          <p className="text-foreground-1 text-xs">{id}</p>
         </div>
       </div>
     </div>
