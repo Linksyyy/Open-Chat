@@ -33,6 +33,7 @@ export default function Login() {
         return;
       }
 
+      localStorage.clear();
       localStorage.setItem(
         "user",
         JSON.stringify({

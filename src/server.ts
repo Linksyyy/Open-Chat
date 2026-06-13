@@ -35,7 +35,19 @@ app.prepare().then(async () => {
   });
 
   io.on("connection", async (socket) => {
-    const user = await db.find_user_by_id(socket.handshake.auth.userId);
+    const userId = socket.handshake.auth.userId;
+    if (!userId) {
+      console.error("Connection attempt without userId");
+      socket.disconnect();
+      return;
+    }
+
+    const user = await db.find_user_by_id(userId);
+    if (!user) {
+      console.error(`User not found for ID: ${userId}`);
+      socket.disconnect();
+      return;
+    }
 
     console.log(`The user ${user.username} connected`);
     socketsMap.set(user.id, socket.id);
