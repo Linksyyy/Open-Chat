@@ -1,7 +1,5 @@
 import { create } from "zustand";
-import { type Messages } from "@/db/queries";
-
-type Message = Messages[number];
+import { type Message } from "@/db/queries";
 
 export type ActualChatStore = {
   id: string;

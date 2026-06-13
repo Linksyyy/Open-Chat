@@ -2,15 +2,27 @@ import useUser from "@/Contexts/userContext";
 import useActualChatMessages from "@/Contexts/actualChatMessagesContext";
 import ChatInput from "./ChatInput";
 import { useSocket } from "@/lib/useSocket";
-import { Messages } from "@/db/queries";
+import { Message } from "@/db/queries";
+import { useEffect, useRef } from "react";
 
 export default function Chat() {
   const userStore = useUser();
-  const { name, messages, setMessages } = useActualChatMessages();
+  const { name, messages, setMessages, addMessage } = useActualChatMessages();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useSocket("chat-messages", (messages) => {
-    setMessages(messages as Messages);
+    setMessages(messages as Message[]);
   });
+
+  useSocket("message-sended", (message) => {
+    addMessage(message as Message);
+  });
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   return (
     <div className="h-full w-full flex flex-col bg-p-1 p-4 md:p-8">
@@ -20,21 +32,38 @@ export default function Chat() {
             <h1 className="text-xl font-bold text-foreground">{name}</h1>
           </div>
         )}
-        <div className="flex-1 w-full overflow-y-auto p-4 flex flex-col gap-3 scrollbar-hide">
-          <div className="mt-auto h-4" />
+        <div
+          ref={scrollRef}
+          className="flex-1 w-full overflow-y-auto p-4 flex flex-col gap-3 scrollbar-hide scroll-smooth"
+        >
+          <div className="mt-auto" />
           {messages.map((message, i) => {
             const isMe = message.sender_id === userStore.id;
+            const time = message.created_at
+              ? new Date(message.created_at).toLocaleTimeString("pt-BR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "";
+
             return (
               <div
                 key={i}
-                className={`max-w-[80%] w-fit px-4 py-2 rounded-2xl text-[15px] leading-relaxed break-all whitespace-pre-wrap overflow-hidden
+                className={`max-w-[80%] w-fit px-4 py-2 rounded-2xl text-[15px] leading-relaxed break-all whitespace-pre-wrap shrink-0 flex flex-col
                 ${
                   isMe
                     ? "bg-s-1 text-white self-end rounded-br-sm"
                     : "bg-p-2 text-foreground self-start rounded-bl-sm"
                 }`}
               >
-                {message.content}
+                <span>{message.content}</span>
+                <span
+                  className={`text-[10px] text-foreground-1 mt-1 self-end opacity-70 ${
+                    isMe ? "text-white" : "text-neutral-500"
+                  }`}
+                >
+                  {time}
+                </span>
               </div>
             );
           })}

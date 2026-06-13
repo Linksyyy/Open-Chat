@@ -8,21 +8,20 @@ import { useRouter } from "next/navigation";
 import Chat from "@/Components/Chat";
 import { socket } from "@/lib/socket";
 import { useSocket } from "@/lib/useSocket";
-import { type ChatWithMembers, type Messages } from "@/db/queries";
+import { type ChatWithMembers, type Message } from "@/db/queries";
 
 export default function Chats() {
   const userStore = useUser();
   const { setChats } = useChatStore();
-  const { setMessages } = useActualChatMessages();
+  const { setMessages, setChatName } = useActualChatMessages();
   const router = useRouter();
 
   useSocket("init", (chats: unknown) => {
-    console.log(chats);
     setChats(chats as ChatWithMembers[]);
   });
 
   useSocket("chat-messages", (messages: unknown) => {
-    setMessages(messages as Messages);
+    setMessages(messages as Message[]);
   });
 
   useEffect(() => {
@@ -33,6 +32,9 @@ export default function Chats() {
       return;
     }
     userStore.setUser(user);
+
+    setMessages([]);
+    setChatName({ id: "", name: "" });
 
     if (!socket.connected) {
       socket.auth = { userId: user.id };
