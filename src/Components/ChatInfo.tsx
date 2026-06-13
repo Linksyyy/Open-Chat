@@ -17,7 +17,7 @@ export default function ChatInfo() {
   }
 
   return (
-    <div className="h-full w-80 bg-p-1 border-l border-p-2 p-6 flex flex-col gap-6 animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-80 md:static md:w-80 md:z-0 bg-p-1 border-l border-p-2 p-6 flex flex-col gap-6 animate-in slide-in-from-right duration-300 shadow-2xl md:shadow-none">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-foreground">Chat Info</h2>
         <button

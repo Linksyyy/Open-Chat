@@ -61,141 +61,140 @@ export default function Sidebar() {
   });
 
   return (
-    <div className="flex flex-col h-screen w-2/10">
-      <div className="h-full flex-col flex w-full bg-p-1 pt-5 px-8">
+    <aside className="flex flex-col h-dvh w-full md:w-80 shrink-0 border-r border-p-2/20 bg-p-1">
+      <div className="flex flex-col h-full pt-5 px-4 md:px-6">
         {/*Navigation Tabs*/}
-        <div className="w-full flex justify-around py-5 items-center">
+        <nav className="flex justify-around py-5 items-center">
           <button
             onClick={() => setView("chats")}
-            className={`${
-              view === "chats" ? "bg-s-1 text-white" : "bg-s-2 text-neutral-400"
-            } hover:bg-s-1 p-2.5 rounded-4xl transition-all duration-100 hover:scale-115 group relative`}
+            className={`p-2.5 rounded-full transition-all duration-200 hover:scale-110 group relative ${
+              view === "chats" ? "bg-s-1 text-white shadow-lg shadow-s-1/20" : "bg-p-2/50 text-neutral-400 hover:bg-p-2"
+            }`}
           >
-            <FaUsers className="group-hover:text-white" />
+            <FaUsers className="size-5 group-hover:text-white" />
           </button>
           <button
             onClick={() => setView("notifications")}
-            className={`${
-              view === "notifications"
-                ? "bg-s-1 text-white"
-                : "bg-s-2 text-neutral-400"
-            } hover:bg-s-1 p-2.5 rounded-4xl transition-all duration-100 hover:scale-115 group relative`}
+            className={`p-2.5 rounded-full transition-all duration-200 hover:scale-110 group relative ${
+              view === "notifications" ? "bg-s-1 text-white shadow-lg shadow-s-1/20" : "bg-p-2/50 text-neutral-400 hover:bg-p-2"
+            }`}
           >
-            <FaBell className="group-hover:text-white" />
+            <FaBell className="size-5 group-hover:text-white" />
             {notifications.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center border-2 border-p-1">
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] size-4 rounded-full flex items-center justify-center border-2 border-p-1">
                 {notifications.length}
               </span>
             )}
           </button>
           <button
             onClick={() => setView("create-group")}
-            className={`${
-              view === "create-group"
-                ? "bg-s-1 text-white"
-                : "bg-s-2 text-neutral-400"
-            } hover:bg-s-1 p-2.5 rounded-4xl transition-all duration-100 hover:scale-115 group`}
+            className={`p-2.5 rounded-full transition-all duration-200 hover:scale-110 group ${
+              view === "create-group" ? "bg-s-1 text-white shadow-lg shadow-s-1/20" : "bg-p-2/50 text-neutral-400 hover:bg-p-2"
+            }`}
           >
-            <FaPlus className="group-hover:text-white" />
+            <FaPlus className="size-5 group-hover:text-white" />
           </button>
-        </div>
+        </nav>
 
         {/*Content Area*/}
-        <div className="bg-p-0 py-4 px-4 h-full w-full rounded-4xl overflow-y-auto">
+        <main className="bg-p-0 my-4 p-4 flex-1 rounded-3xl overflow-y-auto scrollbar-hide border border-p-2/10 shadow-inner">
           {view === "create-group" ? (
-            <div className="flex flex-col gap-4">
-              <h2 className="text-xl font-bold">Create Chat</h2>
+            <div className="flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+              <h2 className="text-xl font-bold px-1">Create Group</h2>
               <input
                 type="text"
                 placeholder="Chat name"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
-                className="bg-p-1 p-2 rounded-xl outline-none"
+                className="bg-p-1 p-3 rounded-2xl outline-none focus:ring-2 focus:ring-s-1/50 transition-all border border-transparent focus:border-s-1/30"
               />
               <button
                 onClick={handleCreateGroup}
-                className="bg-s-2 hover:bg-s-1 text-white p-2 rounded-xl transition-colors cursor-pointer"
+                className="bg-s-1 hover:bg-s-0 text-white p-3 rounded-2xl transition-all font-semibold shadow-md active:scale-95 cursor-pointer"
               >
                 Create
               </button>
               <button
                 onClick={() => setView("chats")}
-                className="text-sm text-neutral-500 hover:text-neutral-700 cursor-pointer"
+                className="text-sm text-neutral-500 hover:text-s-1 transition-colors cursor-pointer text-center"
               >
                 Cancel
               </button>
             </div>
           ) : view === "chats" ? (
-            <div>
-              <h2 className="text-xl font-bold mb-4 text-p-3">Chats</h2>
-              <div className="flex flex-col gap-2">
+            <div className="animate-in fade-in slide-in-from-left-2 duration-200">
+              <h2 className="text-xl font-bold mb-4 text-p-3 px-1">Chats</h2>
+              <div className="flex flex-col gap-1">
                 {chats.length > 0 ? (
                   chats.map((chat, i) => (
                     <button
-                      key={i}
-                      className="w-full text-left flex flex-col transition-all duration-200 ease-in-out hover:bg-p-2 rounded-2xl p-3 group hover:scale-95 cursor-pointer"
+                      key={chat.id || i}
+                      className="w-full text-left flex items-center transition-all duration-200 hover:bg-p-1 active:bg-p-2 rounded-2xl p-3 group cursor-pointer border border-transparent hover:border-p-2/20"
                       onClick={() => handleChatClick(chat)}
                     >
-                      <h2 className="font-semibold text-base text-foreground group-hover:text-foreground-1 transition-colors">
+                      <div className="size-10 rounded-xl bg-s-1/10 flex items-center justify-center mr-3 group-hover:bg-s-1/20 transition-colors">
+                        <span className="text-s-1 font-bold">{chat.name[0].toUpperCase()}</span>
+                      </div>
+                      <h2 className="font-semibold text-base text-foreground truncate">
                         {chat.name}
                       </h2>
                     </button>
                   ))
                 ) : (
-                  <p className="text-neutral-400 text-sm text-center py-4">
+                  <p className="text-neutral-400 text-sm text-center py-10 italic">
                     No chats found
                   </p>
                 )}
               </div>
             </div>
           ) : (
-            <div>
-              <h2 className="text-xl font-bold mb-4 text-p-3">Notifications</h2>
+            <div className="animate-in fade-in slide-in-from-right-2 duration-200">
+              <h2 className="text-xl font-bold mb-4 text-p-3 px-1">Notifications</h2>
               <div className="flex flex-col gap-3">
                 {notifications.length > 0 ? (
-                  notifications.map((n, i) => (
+                  notifications.map((n) => (
                     <div
-                      key={i}
-                      className="bg-p-1 p-3 rounded-2xl flex flex-col gap-2 shadow-sm border border-p-2/50"
+                      key={n.id}
+                      className="bg-p-1/50 p-4 rounded-2xl flex flex-col gap-3 border border-p-2/20"
                     >
-                      <p className="text-sm text-foreground">
-                        <span className="font-bold">{n.sender.username}</span> invited you to join{" "}
+                      <p className="text-sm text-foreground leading-relaxed">
+                        <span className="font-bold text-s-1">{n.sender.username}</span> invited you to join{" "}
                         <span className="font-bold">{n.chat.name}</span>
                       </p>
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleAcceptInvite(n.id)}
-                          className="flex-1 bg-s-1 hover:bg-s-0 text-white text-xs py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 font-medium cursor-pointer"
+                          className="flex-1 bg-s-1 hover:bg-s-0 text-white text-xs py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 font-bold shadow-sm active:scale-95 cursor-pointer"
                         >
-                          <FaCheck size={10} />
+                          <FaCheck size={12} />
                           Accept
                         </button>
                         <button
                           onClick={() => handleDeclineInvite(n.id)}
-                          className="flex-1 bg-p-2 hover:bg-p-3 text-foreground text-xs py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 font-medium cursor-pointer"
+                          className="flex-1 bg-p-2/40 hover:bg-p-2 text-foreground text-xs py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 font-bold active:scale-95 cursor-pointer"
                         >
-                          <FaTimes size={10} />
+                          <FaTimes size={12} />
                           Decline
                         </button>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-neutral-400 text-sm">No new notifications</p>
+                  <p className="text-neutral-400 text-sm text-center py-10 italic">No notifications</p>
                 )}
               </div>
             </div>
           )}
-        </div>
+        </main>
 
         {/*User info*/}
-        <div className="w-full flex flex-col py-5 justify-center items-center">
-          <p className="text-foreground">Logged in as {username}</p>
-          <p className="text-foreground-1 text-sm">
-            Created at {enteredAt.toLocaleDateString("pt-br")}
+        <footer className="w-full flex flex-col py-6 items-center border-t border-p-2/10 mt-auto">
+          <p className="text-foreground font-semibold">{username}</p>
+          <p className="text-foreground-1 text-[11px] uppercase tracking-tighter opacity-70">
+            Joined {enteredAt.toLocaleDateString("pt-br")}
           </p>
-        </div>
+        </footer>
       </div>
-    </div>
+    </aside>
   );
 }

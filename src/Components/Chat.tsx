@@ -4,13 +4,13 @@ import ChatInput from "./ChatInput";
 import { useSocket } from "@/lib/useSocket";
 import { Message } from "@/db/queries";
 import { useEffect, useRef } from "react";
-import { FaInfoCircle } from "react-icons/fa";
+import { FaInfoCircle, FaChevronLeft } from "react-icons/fa";
 import useChatInfoStore from "@/Contexts/chatInfoContext";
 import ChatInfo from "./ChatInfo";
 
 export default function Chat() {
   const userStore = useUser();
-  const { id: chatId, name, messages, setMessages, addMessage } = useActualChatMessages();
+  const { id: chatId, name, messages, setMessages, addMessage, setChatName } = useActualChatMessages();
   const { isOpen, setIsOpen } = useChatInfoStore();
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -30,24 +30,35 @@ export default function Chat() {
 
   return (
     <div className="h-full w-full flex bg-p-1">
-      <div className="flex-1 h-full flex flex-col p-4 md:p-8 overflow-hidden">
-        <div className="flex-1 w-full bg-p-0 rounded-3xl shadow-sm flex flex-col overflow-hidden relative">
+      <div className="flex-1 h-full flex flex-col p-0 md:p-6 overflow-hidden">
+        <div className="flex-1 w-full bg-p-0 md:rounded-3xl shadow-xs flex flex-col overflow-hidden relative border-x md:border border-p-2/10">
           {name && (
-            <div className="p-4 border-b border-p-2 bg-p-0 z-10 flex justify-between items-center">
-              <h1 className="text-xl font-bold text-foreground">{name}</h1>
+            <header className="p-3 md:p-4 border-b border-p-2/20 bg-p-0/80 backdrop-blur-md z-10 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setChatName({ id: "", name: "" })}
+                  className="md:hidden p-2 text-neutral-400 hover:text-s-1 transition-colors cursor-pointer active:scale-90"
+                >
+                  <FaChevronLeft size={20} />
+                </button>
+                <div className="flex flex-col justify-center">
+                  <h1 className="text-base md:text-lg font-bold text-foreground truncate max-w-[200px] md:max-w-md">{name}</h1>
+                </div>
+              </div>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`transition-colors cursor-pointer ${
-                  isOpen ? "text-s-1" : "text-neutral-400 hover:text-foreground"
+                className={`p-2 rounded-xl transition-all cursor-pointer hover:bg-p-1 ${
+                  isOpen ? "text-s-1 bg-s-1/10" : "text-neutral-400 hover:text-foreground"
                 }`}
               >
                 <FaInfoCircle size={22} />
               </button>
-            </div>
+            </header>
           )}
+          
           <div
             ref={scrollRef}
-            className="flex-1 w-full overflow-y-auto p-4 flex flex-col gap-3 scrollbar-hide scroll-smooth"
+            className="flex-1 w-full overflow-y-auto p-4 flex flex-col gap-4 scrollbar-hide scroll-smooth"
           >
             <div className="mt-auto" />
             {messages.map((message, i) => {
@@ -61,17 +72,22 @@ export default function Chat() {
 
               return (
                 <div
-                  key={i}
-                  className={`max-w-[80%] w-fit px-4 py-2 rounded-2xl text-[15px] leading-relaxed break-all whitespace-pre-wrap shrink-0 flex flex-col
+                  key={message.id || i}
+                  className={`group max-w-[85%] md:max-w-[70%] w-fit px-4 py-2.5 rounded-2xl text-[14px] md:text-[15px] leading-relaxed break-all whitespace-pre-wrap shrink-0 flex flex-col shadow-xs transition-transform duration-200 hover:scale-[1.01]
                   ${
                     isMe
-                      ? "bg-s-1 text-white self-end rounded-br-sm"
-                      : "bg-p-2 text-foreground self-start rounded-bl-sm"
+                      ? "bg-s-1 text-white self-end rounded-br-none"
+                      : "bg-p-1 text-foreground self-start rounded-bl-none"
                   }`}
                 >
+                  {!isMe && (
+                    <span className="text-[10px] font-bold mb-1 opacity-60 uppercase tracking-tighter">
+                      {message.sender?.username || "User"}
+                    </span>
+                  )}
                   <span>{message.content}</span>
                   <span
-                    className={`text-[10px] text-foreground-1 mt-1 self-end opacity-70 ${
+                    className={`text-[9px] mt-1 self-end font-medium opacity-50 ${
                       isMe ? "text-white" : "text-neutral-500"
                     }`}
                   >
@@ -80,14 +96,12 @@ export default function Chat() {
                 </div>
               );
             })}
-            <div className="h-32 shrink-0" />
+            <div className="h-4 shrink-0" />
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 bg-linear-to-t from-p-0 via-p-0/90 to-transparent backdrop-blur-sm pointer-events-none">
-            <div className="pointer-events-auto pt-8">
-              <ChatInput />
-            </div>
-          </div>
+          <footer className="p-3 md:p-4 bg-p-0 border-t border-p-2/10">
+            <ChatInput />
+          </footer>
         </div>
       </div>
       {isOpen && chatId && <ChatInfo />}

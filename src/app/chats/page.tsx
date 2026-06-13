@@ -13,7 +13,7 @@ import { type ChatWithMembers, type Message } from "@/db/queries";
 export default function Chats() {
   const userStore = useUser();
   const { setChats } = useChatStore();
-  const { setMessages, setChatName } = useActualChatMessages();
+  const { id: chatId, setMessages, setChatName } = useActualChatMessages();
   const router = useRouter();
 
   useSocket("init", (chats: unknown) => {
@@ -48,11 +48,13 @@ export default function Chats() {
   }, []);
 
   return (
-    <div className="flex h-screen font-sans bg-p-0 overflow-x-hidden">
-      <Sidebar />
-      <div className="flex-1 min-w-0">
-        <Chat />
+    <div className="flex h-dvh w-screen font-sans bg-p-1 overflow-hidden antialiased selection:bg-s-1/30 selection:text-s-3">
+      <div className={`${chatId ? "hidden md:flex" : "flex"} w-full md:w-auto shrink-0 transition-all duration-300 ease-in-out`}>
+        <Sidebar />
       </div>
+      <main className={`${!chatId ? "hidden md:flex" : "flex"} flex-1 min-w-0 bg-p-1 transition-all duration-300 ease-in-out`}>
+        <Chat />
+      </main>
     </div>
   );
 }

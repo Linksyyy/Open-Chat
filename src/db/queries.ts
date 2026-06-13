@@ -165,7 +165,7 @@ export async function get_user_role_in_chat(chat_id: string, user_id: string) {
 export type ChatWithMembers = NonNullable<
   Awaited<ReturnType<typeof find_chat_by_id>>
 >;
-export type Message = typeof schemas.messages.$inferSelect;
+export type Message = Awaited<ReturnType<typeof find_messages_by_id>>[number];
 export type NotificationWithDetails = Awaited<
   ReturnType<typeof find_user_notifications>
 >[number];
