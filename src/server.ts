@@ -40,7 +40,7 @@ app.prepare().then(async () => {
     console.log(`The user ${user.username} connected`);
     socketsMap.set(user.id, socket.id);
 
-    const userChats = await db.get_user_chats(user.id);
+    const userChats = await db.find_user_chats(user.id);
     socket.emit("init", userChats);
     socket.on("create-group", async (groupName: string) => {
       const group = await db.create_group(groupName, user.id);
@@ -51,6 +51,17 @@ app.prepare().then(async () => {
     socket.on("get-chat-messages", async (chatId: string) => {
       const messages = await db.find_messages_by_id(chatId);
       socket.emit("chat-messages", messages);
+    });
+
+    socket.on("join-chat", (chatId) => {
+      socket.join(chatId);
+      console.log(`User ${user.username} joined chat ${chatId}`);
+    });
+
+    socket.on("send-message", async (chatId, content) => {
+      console.log(chatId, content);
+      const message = await db.create_message(user.id, chatId, content);
+      io.to(chatId).emit("message-sended", message);
     });
   });
   const port = process.env.PORT || 3000;
