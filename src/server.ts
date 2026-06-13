@@ -42,10 +42,55 @@ app.prepare().then(async () => {
 
     const userChats = await db.find_user_chats(user.id);
     socket.emit("init", userChats);
+
+    const notifications = await db.find_user_notifications(user.id);
+    socket.emit("notifications", notifications);
+
     socket.on("create-group", async (groupName: string) => {
       const group = await db.create_group(groupName, user.id);
       const chat = await db.find_chat_by_id(group.id);
       socket.emit("group-created", chat);
+    });
+
+    socket.on("send-invite", async ({ chatId, username }) => {
+      const role = await db.get_user_role_in_chat(chatId, user.id);
+      if (role !== "admin") {
+        console.log(`User ${user.username} tried to invite without permission`);
+        return;
+      }
+
+      const receiver = await db.find_user_by_username(username);
+      if (!receiver) return;
+
+      const notification = await db.create_notification(
+        user.id,
+        chatId,
+        receiver.id,
+        "chat_invite",
+      );
+
+      const notificationWithDetails = (
+        await db.find_user_notifications(receiver.id)
+      ).find((n) => n.id === notification.id);
+
+      const receiverSocketId = socketsMap.get(receiver.id);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("new-notification", notificationWithDetails);
+      }
+    });
+
+    socket.on("accept-invite", async (notificationId: string) => {
+      const notifications = await db.find_user_notifications(user.id);
+      const notification = notifications.find((n) => n.id === notificationId);
+
+      if (!notification) return;
+
+      await db.add_chat_member(notification.chat_id, user.id);
+      await db.delete_notification(notificationId);
+
+      const chat = await db.find_chat_by_id(notification.chat_id);
+      socket.emit("group-created", chat);
+      socket.emit("notification-deleted", notificationId);
     });
 
     socket.on("get-chat-messages", async (chatId: string) => {

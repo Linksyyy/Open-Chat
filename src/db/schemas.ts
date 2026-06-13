@@ -100,10 +100,14 @@ export const notifications = pgTable("notifications", {
   sender_id: uuid()
     .references(() => users.id)
     .notNull(),
+  receiver_id: uuid()
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
   chat_id: uuid()
     .references(() => chats.id, { onDelete: "cascade" })
     .notNull(),
   type: notificationsTypesEnum().notNull(),
+  created_at: timestamp().defaultNow(),
 });
 
 export const notificationsRelations = relations(notifications, ({ one }) => ({

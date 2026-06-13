@@ -1,17 +1,19 @@
 "use client";
 import useUser from "@/Contexts/userContext";
 import useChatStore from "@/Contexts/chatContext";
+import useNotificationStore from "@/Contexts/notificationContext";
 import { useState } from "react";
-import { FaPlus, FaUsers } from "react-icons/fa";
+import { FaPlus, FaUsers, FaCheck } from "react-icons/fa";
 import { FaBell } from "react-icons/fa6";
 import { socket } from "@/lib/socket";
 import { useSocket } from "@/lib/useSocket";
-import { ChatWithMembers } from "@/db/queries";
+import { ChatWithMembers, NotificationWithDetails } from "@/db/queries";
 import useActualChatMessages from "@/Contexts/actualChatMessagesContext";
 
 export default function Sidebar() {
   const { username, created_at } = useUser();
   const { chats, addChat } = useChatStore();
+  const { notifications, setNotifications, addNotification, removeNotification } = useNotificationStore();
   const { setChatName, setMessages } = useActualChatMessages();
   const [view, setView] = useState<"chats" | "notifications" | "create-group">(
     "chats",
@@ -34,8 +36,24 @@ export default function Sidebar() {
     socket.emit("join-chat", chat.id);
   }
 
+  function handleAcceptInvite(notificationId: string) {
+    socket.emit("accept-invite", notificationId);
+  }
+
   useSocket("group-created", (group) => {
     addChat(group as ChatWithMembers);
+  });
+
+  useSocket("notifications", (notifications) => {
+    setNotifications(notifications as NotificationWithDetails[]);
+  });
+
+  useSocket("new-notification", (notification) => {
+    addNotification(notification as NotificationWithDetails);
+  });
+
+  useSocket("notification-deleted", (notificationId) => {
+    removeNotification(notificationId as string);
   });
 
   return (
@@ -47,7 +65,7 @@ export default function Sidebar() {
             onClick={() => setView("chats")}
             className={`${
               view === "chats" ? "bg-s-1 text-white" : "bg-s-2 text-neutral-400"
-            } hover:bg-s-1 p-2.5 rounded-4xl transition-all duration-100 hover:scale-115 group`}
+            } hover:bg-s-1 p-2.5 rounded-4xl transition-all duration-100 hover:scale-115 group relative`}
           >
             <FaUsers className="group-hover:text-white" />
           </button>
@@ -57,9 +75,14 @@ export default function Sidebar() {
               view === "notifications"
                 ? "bg-s-1 text-white"
                 : "bg-s-2 text-neutral-400"
-            } hover:bg-s-1 p-2.5 rounded-4xl transition-all duration-100 hover:scale-115 group`}
+            } hover:bg-s-1 p-2.5 rounded-4xl transition-all duration-100 hover:scale-115 group relative`}
           >
             <FaBell className="group-hover:text-white" />
+            {notifications.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center border-2 border-p-1">
+                {notifications.length}
+              </span>
+            )}
           </button>
           <button
             onClick={() => setView("create-group")}
@@ -77,23 +100,23 @@ export default function Sidebar() {
         <div className="bg-p-0 py-4 px-4 h-full w-full rounded-4xl overflow-y-auto">
           {view === "create-group" ? (
             <div className="flex flex-col gap-4">
-              <h2 className="text-xl font-bold">Create Group</h2>
+              <h2 className="text-xl font-bold">Create Chat</h2>
               <input
                 type="text"
-                placeholder="Group name"
+                placeholder="Chat name"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
                 className="bg-p-1 p-2 rounded-xl outline-none"
               />
               <button
                 onClick={handleCreateGroup}
-                className="bg-s-2 hover:bg-s-1 text-white p-2 rounded-xl transition-colors"
+                className="bg-s-2 hover:bg-s-1 text-white p-2 rounded-xl transition-colors cursor-pointer"
               >
                 Create
               </button>
               <button
                 onClick={() => setView("chats")}
-                className="text-sm text-neutral-500 hover:text-neutral-700"
+                className="text-sm text-neutral-500 hover:text-neutral-700 cursor-pointer"
               >
                 Cancel
               </button>
@@ -124,7 +147,30 @@ export default function Sidebar() {
           ) : (
             <div>
               <h2 className="text-xl font-bold mb-4 text-p-3">Notifications</h2>
-              <p className="text-neutral-400 text-sm">No new notifications</p>
+              <div className="flex flex-col gap-3">
+                {notifications.length > 0 ? (
+                  notifications.map((n, i) => (
+                    <div
+                      key={i}
+                      className="bg-p-1 p-3 rounded-2xl flex flex-col gap-2 shadow-sm border border-p-2/50"
+                    >
+                      <p className="text-sm text-foreground">
+                        <span className="font-bold">{n.sender.username}</span> invited you to join{" "}
+                        <span className="font-bold">{n.chat.name}</span>
+                      </p>
+                      <button
+                        onClick={() => handleAcceptInvite(n.id)}
+                        className="bg-s-1 hover:bg-s-0 text-white text-xs py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 font-medium cursor-pointer"
+                      >
+                        <FaCheck size={10} />
+                        Accept
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-neutral-400 text-sm">No new notifications</p>
+                )}
+              </div>
             </div>
           )}
         </div>
