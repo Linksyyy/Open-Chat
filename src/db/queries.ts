@@ -162,6 +162,20 @@ export async function get_user_role_in_chat(chat_id: string, user_id: string) {
   return membership.role;
 }
 
+export async function find_message_by_id(message_id: string) {
+  return await db.query.messages.findFirst({
+    where: eq(schemas.messages.id, message_id),
+    with: {
+      sender: {
+        columns: {
+          id: true,
+          username: true,
+        },
+      },
+    },
+  });
+}
+
 export type ChatWithMembers = NonNullable<
   Awaited<ReturnType<typeof find_chat_by_id>>
 >;

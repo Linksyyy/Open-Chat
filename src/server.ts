@@ -110,8 +110,9 @@ app.prepare().then(async () => {
 
     socket.on("send-message", async (chatId, content) => {
       console.log(chatId, content);
-      const message = await db.create_message(user.id, chatId, content);
-      io.to(chatId).emit("message-sended", message);
+      const createdMessage = await db.create_message(user.id, chatId, content);
+      const messageWithSender = await db.find_message_by_id(createdMessage.id);
+      io.to(chatId).emit("message-sended", messageWithSender);
     });
   });
   const port = process.env.PORT || 3000;
